@@ -37,6 +37,12 @@ def crop_image(img_path, json_path, n):
     return crop_img
 
 
+def multiple_crop(img_path, json_path):
+    for i in range(0, 10):
+        matrix = crop_image(img_path, json_path, i)
+        matrix.save(f'crop_matrices/pic_8_matrix_{i}.jpg')
+
+
 def show_hist(img_path, json_path, n):
     """
     :param img_path: picture path

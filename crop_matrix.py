@@ -54,8 +54,8 @@ def show_hist(img_path, json_path, n):
     crop = crop_image(img_path, json_path, n)
     crop.convert('L')
     img_arr = np.array(crop)
-    contrast = img_arr.std(axis=1)
-    plt.hist(contrast.flatten(), bins=256, range=(0, 256), fc='k', ec='k')
+    contrast = img_arr.std(axis=0)
+    plt.hist(contrast.flatten(), bins=len(contrast), range=(0, 256), fc='k', ec='k')
     plt.show()
     #plt.savefig(f'hist_1.png')
 
@@ -72,8 +72,8 @@ def show_multiple(img_path, json_path):
         crop = crop_image(img_path, json_path, i)
         crop.convert('L')
         img_arr = np.array(crop)
-        contrast = img_arr.std(axis=1)
-        plt.hist(contrast.flatten(), bins=256, range=(0, 256), fc='k', ec='k')
+        contrast = img_arr.std(axis=0)
+        plt.hist(contrast.flatten(), bins=len(contrast), range=(0, 256), fc='k', ec='k')
         plt.show()
         #plt.savefig(f'histograms/pic_8_hist_{i}.png')
 

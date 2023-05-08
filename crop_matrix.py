@@ -2,6 +2,9 @@ from PIL import Image
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import cv2
+from pathlib import Path
+import os
 
 
 def crop_image(img_path, json_path, n):
@@ -50,14 +53,17 @@ def show_hist(img_path, json_path, n):
     :param n: picture number
     :return: intensity distribution histogram
     """
-    #plt.switch_backend('agg') необходимо снять комментарий с этой строки чтобы гистограмма корректно сохранялась
+    plt.switch_backend('agg') #необходимо снять комментарий с этой строки чтобы гистограмма корректно сохранялась
     crop = crop_image(img_path, json_path, n)
     crop.convert('L')
     img_arr = np.array(crop)
-    contrast = img_arr.std(axis=0)
-    plt.hist(contrast.flatten(), bins=len(contrast), range=(0, 256), fc='k', ec='k')
+    #ret, crop_thresh = cv2.threshold(img_arr, 130, 255, cv2.THRESH_BINARY)
+    b = np.sum(crop, axis=0)
+    print(b[:,0].shape)
+    print(b[:,0])
+    plt.plot(b[:,0])#, bins=b[:,0].shape[0], fc='k', ec='k')
     plt.show()
-    #plt.savefig(f'hist_1.png')
+    plt.savefig(f'hist_1_non_thresh.png')
 
 
 def show_multiple(img_path, json_path):
@@ -67,7 +73,7 @@ def show_multiple(img_path, json_path):
     :param json_path: json coordinates path
     :return: returns intensity distribution histogram for all cropped matrices from the original image
     """
-    #plt.switch_backend('agg') необходимо снять комментарий с этой строки чтобы гистограмма корректно сохранялась
+    plt.switch_backend('agg') # необходимо снять комментарий с этой строки чтобы гистограмма корректно сохранялась
     for i in range(0, 10):
         crop = crop_image(img_path, json_path, i)
         crop.convert('L')
@@ -75,7 +81,30 @@ def show_multiple(img_path, json_path):
         contrast = img_arr.std(axis=0)
         plt.hist(contrast.flatten(), bins=len(contrast), range=(0, 256), fc='k', ec='k')
         plt.show()
-        #plt.savefig(f'histograms/pic_8_hist_{i}.png')
+        plt.savefig(f'histograms_with_axis_0/pic_8_hist_{i}.png')
+
+
+def erode_thresh(img_path):
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    thresh = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
+    # kernel = np.array([[0,1], [0,1]], dtype=np.uint8)
+    kernel = np.ones((2, 2), np.uint8)
+    erode_img = thresh # cv2.dilate(thresh, kernel)
+    b = np.sum(erode_img, axis=0)
+    plt.plot(b)
+    plt.show()
+    cv2.imwrite('erode/pic2_ones.jpg', erode_img)
+
+def erode_for_all(dir_path):
+    # kernel = np.ones((2,2), np.uint8)
+    for filename in os.listdir(dir_path):
+        print(filename)
+        new_file = cv2.imread(dir_path + '/' + filename, cv2.IMREAD_GRAYSCALE)
+        print(new_file)
+        thresh = cv2.adaptiveThreshold(new_file, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
+        b = np.sum(thresh, axis=0)
+        cv2.imwrite(f'erode/pic{filename}.jpg', thresh)
+
 
 
 

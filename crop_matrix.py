@@ -93,7 +93,7 @@ def erode_thresh(img_path):
     b = np.sum(erode_img, axis=0)
     plt.plot(b)
     plt.show()
-    cv2.imwrite('erode/pic2_ones.jpg', erode_img)
+    cv2.imwrite('thresholded/pic2_ones.jpg', erode_img)
 
 def erode_for_all(dir_path):
     # kernel = np.ones((2,2), np.uint8)
@@ -103,7 +103,7 @@ def erode_for_all(dir_path):
         print(new_file)
         thresh = cv2.adaptiveThreshold(new_file, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
         b = np.sum(thresh, axis=0)
-        cv2.imwrite(f'erode/pic{filename}.jpg', thresh)
+        cv2.imwrite(f'thresholded/{filename}', thresh)
 
 
 

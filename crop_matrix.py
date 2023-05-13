@@ -86,7 +86,7 @@ def show_multiple(img_path, json_path):
 
 def erode_thresh(img_path):
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    thresh = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
+    thresh = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 17)
     # kernel = np.array([[0,1], [0,1]], dtype=np.uint8)
     kernel = np.ones((2, 2), np.uint8)
     erode_img = thresh # cv2.dilate(thresh, kernel)
@@ -98,16 +98,52 @@ def erode_thresh(img_path):
 def erode_for_all(dir_path):
     # kernel = np.ones((2,2), np.uint8)
     for filename in os.listdir(dir_path):
-        print(filename)
+        #print(filename)
         new_file = cv2.imread(dir_path + '/' + filename, cv2.IMREAD_GRAYSCALE)
-        print(new_file)
+        #print(new_file)
         thresh = cv2.adaptiveThreshold(new_file, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
         b = np.sum(thresh, axis=0)
         cv2.imwrite(f'thresholded/{filename}', thresh)
 
 
+def morph(img_path):
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    thresh = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 15)
+    kernel = np.ones((1, 1), np.uint8)
+    # kernel = np.array([[0, 1], [0, 1]], dtype=np.uint8)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+    cv2.imwrite('morph.jpg', opening)
 
 
+def delete_black_dots(img_path):
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    # бинаризация изображения
+    _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    print(cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # удаление мелких объектов
+    kernel = np.ones((2, 2), np.uint8)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+    # удаление вертикальных и горизонтальных линий
+    kernel_h = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
+    kernel_v = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
+    img_h = cv2.morphologyEx(opening, cv2.MORPH_OPEN, kernel_h)
+    img_v = cv2.morphologyEx(opening, cv2.MORPH_OPEN, kernel_v)
+    result = img_v + img_h
+    cv2.imwrite('result1.jpg', result)
+
+
+def delete_for_all_pics(dir_path):
+    for filename in os.listdir(dir_path):
+        img = cv2.imread(dir_path + '/' + filename, cv2.IMREAD_GRAYSCALE)
+        _, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+        kernel = np.ones((2,2), np.uint8)
+        opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+        kernel_h = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
+        kernel_v = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
+        img_h = cv2.morphologyEx(opening, cv2.MORPH_OPEN, kernel_h)
+        img_v = cv2.morphologyEx(opening, cv2.MORPH_OPEN, kernel_v)
+        result = img_v + img_h
+        cv2.imwrite(f'dots_deleted_with_nine/{filename}', result)
 
 
 

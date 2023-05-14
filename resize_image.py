@@ -2,8 +2,13 @@ from PIL import Image
 import os
 
 
-def resize(dir_path):
-    fixed_width = 800
+def resize(dir_path, fixed_width):
+    """
+    функция пропорционально меняет размер изображения в зависимости от заданной ширины
+    :param dir_path: image path
+    :param fixed_width: fixed width in pixels
+    :return:
+    """
     for filename in os.listdir(dir_path):
         img = Image.open(dir_path + '/' + filename)
         width_percent = (fixed_width / float(img.size[0]))
